@@ -1,0 +1,202 @@
+<div class="drink-management-container">
+  <h2>Quản lý đồ uống</h2>
+
+  <!-- Add New Drink Button -->
+  <div class="action-bar">
+    <button (click)="openAddDrinkModal()" class="add-drink-btn">
+      Thêm đồ uống mới
+    </button>
+  </div>
+
+  <!-- Search bar -->
+  <div class="search-bar">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      (keyup.enter)="searchDrinks()"
+      placeholder="Tìm kiếm đồ uống..."
+    >
+    <button (click)="searchDrinks()">Tìm kiếm</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Đang tải dữ liệu...
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <!-- Drinks table -->
+  <div class="drinks-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tên đồ uống</th>
+          <th>Giá</th>
+          <th>Hình ảnh</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let drink of drinks">
+          <td>{{ drink.drinkId }}</td>
+          <td>{{ drink.name }}</td>
+          <td>{{ drink.price | currency:'VND' }}</td>
+          <td>
+            <img [src]="drink.imageUrl" [alt]="drink.name" class="drink-image">
+          </td>
+          <td class="action-buttons">
+            <button (click)="viewRecipe(drink)" class="view-recipe-btn">
+              Xem công thức
+            </button>
+            <button (click)="openEditDrinkModal(drink)" class="edit-btn">
+              Sửa
+            </button>
+            <!-- <button (click)="deleteDrink(drink.drinkId)" class="delete-btn">
+              Xóa
+            </button> -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recipe Modal -->
+  <div *ngIf="selectedDrink" class="recipe-modal">
+    <div class="modal-content">
+      <h3>Công thức: {{ selectedDrink.name }}</h3>
+      <button class="close-btn" (click)="closeRecipe()">×</button>
+      
+      <table class="recipe-table">
+        <thead>
+          <tr>
+            <th>Nguyên liệu</th>
+            <th>Số lượng</th>
+            <th>Đơn vị</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let recipe of drinkRecipes">
+            <td>{{ recipe.ingredient.name }}</td>
+            <td>{{ recipe.quantity }}</td>
+            <td>{{ recipe.ingredient.unit }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Drink Modal -->
+  <div *ngIf="showAddDrinkModal" class="modal">
+    <div class="modal-content">
+      <h3>Thêm đồ uống mới</h3>
+      <button class="close-btn" (click)="closeAddDrinkModal()">×</button>
+      
+      <form (ngSubmit)="submitNewDrink()" #drinkForm="ngForm">
+        <div class="form-group">
+          <label for="name">Tên đồ uống:</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            [(ngModel)]="newDrink.name" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="price">Giá:</label>
+          <input 
+            type="number" 
+            id="price" 
+            name="price" 
+            [(ngModel)]="newDrink.price" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="description">Mô tả:</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            [(ngModel)]="newDrink.description"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="imageUrl">URL hình ảnh:</label>
+          <input 
+            type="text" 
+            id="imageUrl" 
+            name="imageUrl" 
+            [(ngModel)]="newDrink.imageUrl"
+          >
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="!drinkForm.form.valid">Thêm</button>
+          <button type="button" (click)="closeAddDrinkModal()">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Drink Modal -->
+  <div *ngIf="showEditDrinkModal" class="modal">
+    <div class="modal-content">
+      <h3>Sửa đồ uống</h3>
+      <button class="close-btn" (click)="closeEditDrinkModal()">×</button>
+      
+      <form (ngSubmit)="submitEditDrink()" #editDrinkForm="ngForm">
+        <div class="form-group">
+          <label for="edit-name">Tên đồ uống:</label>
+          <input 
+            type="text" 
+            id="edit-name" 
+            name="name" 
+            [(ngModel)]="editDrinkDTO.name" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="edit-price">Giá:</label>
+          <input 
+            type="number" 
+            id="edit-price" 
+            name="price" 
+            [(ngModel)]="editDrinkDTO.price" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="edit-description">Mô tả:</label>
+          <textarea 
+            id="edit-description" 
+            name="description" 
+            [(ngModel)]="editDrinkDTO.description"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-imageUrl">URL hình ảnh:</label>
+          <input 
+            type="text" 
+            id="edit-imageUrl" 
+            name="imageUrl" 
+            [(ngModel)]="editDrinkDTO.imageUrl"
+          >
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="!editDrinkForm.form.valid">Lưu</button>
+          <button type="button" (click)="closeEditDrinkModal()">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

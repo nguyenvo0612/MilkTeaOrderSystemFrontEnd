@@ -1,0 +1,166 @@
+<div class="ingredient-container">
+  <div class="page-header">
+    <h2>Quản lý nguyên liệu</h2>
+    <button class="btn btn-primary" (click)="openAddForm()">
+      <i class="fas fa-plus"></i> Thêm nguyên liệu mới
+    </button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Đang tải danh sách nguyên liệu...</p>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">
+    <p>{{ error }}</p>
+    <button class="btn btn-outline-danger" (click)="loadIngredients()">Thử lại</button>
+  </div>
+
+  <!-- Bảng danh sách nguyên liệu -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">Danh sách nguyên liệu</h3>
+      <div class="search-box">
+        <input type="text" class="form-control" placeholder="Tìm kiếm nguyên liệu..." [(ngModel)]="searchTerm" (input)="filterIngredients()">
+      </div>
+    </div>
+    
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Tên nguyên liệu</th>
+              <th>Đơn vị</th>
+              <th>Số lượng tồn kho</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ingredient of filteredIngredients">
+              <td>{{ ingredient.ingredientId }}</td>
+              <td>{{ ingredient.name }}</td>
+              <td>{{ ingredient.unit }}</td>
+              <td>{{ ingredient.stockQuantity }}</td>
+              <td>
+                <span class="badge" [ngClass]="ingredient.status ? 'bg-success' : 'bg-danger'">
+                  {{ ingredient.status ? 'Đang sử dụng' : 'Ngưng sử dụng' }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary" (click)="openEditForm(ingredient)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-success" (click)="openImportForm(ingredient)">
+                    <i class="fas fa-box"></i>
+                  </button>
+                  <button class="btn btn-sm" [ngClass]="ingredient.status ? 'btn-outline-danger' : 'btn-outline-success'"
+                          (click)="toggleStatus(ingredient)">
+                    <i class="fas" [ngClass]="ingredient.status ? 'fa-ban' : 'fa-check'"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bảng lịch sử nhập hàng -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="mb-0">Lịch sử nhập hàng</h3>
+    </div>
+    
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Nguyên liệu</th>
+              <th>Số lượng nhập</th>
+              <th>Giá nhập</th>
+              <th>Ngày nhập</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of purchaseLogs">
+              <td>{{ log.purchaseLogId }}</td>
+              <td>{{ log.ingredient.name }}</td>
+              <td>{{ log.quantity }}</td>
+              <td>{{ log.price | currency:'VND':'symbol-narrow':'1.0-0' }}</td>
+              <td>{{ log.purchaseDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal thêm/sửa nguyên liệu -->
+  <div class="modal fade" [class.show]="selectedIngredient !== null" [style.display]="selectedIngredient !== null ? 'block' : 'none'">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ isEditing ? 'Sửa nguyên liệu' : 'Thêm nguyên liệu mới' }}</h5>
+          <button type="button" class="btn-close" (click)="closeForm()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="saveIngredient()">
+            <div class="mb-3">
+              <label for="name" class="form-label">Tên nguyên liệu:</label>
+              <input type="text" class="form-control" id="name" [(ngModel)]="formData.name" name="name" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="unit" class="form-label">Đơn vị:</label>
+              <input type="text" class="form-control" id="unit" [(ngModel)]="formData.unit" name="unit" required>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="closeForm()">Hủy</button>
+              <button type="submit" class="btn btn-primary">{{ isEditing ? 'Cập nhật' : 'Thêm mới' }}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal nhập hàng -->
+  <div class="modal fade" [class.show]="importFormData.ingredientId !== 0" [style.display]="importFormData.ingredientId !== 0 ? 'block' : 'none'">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Nhập nguyên liệu</h5>
+          <button type="button" class="btn-close" (click)="importFormData.ingredientId = 0"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="importIngredient()">
+            <div class="mb-3">
+              <label for="importQuantity" class="form-label">Số lượng nhập:</label>
+              <input type="number" class="form-control" id="importQuantity" [(ngModel)]="importFormData.quantity" name="quantity" required step="0.01">
+            </div>
+
+            <div class="mb-3">
+              <label for="importPrice" class="form-label">Giá nhập:</label>
+              <input type="number" class="form-control" id="importPrice" [(ngModel)]="importFormData.price" name="price" required step="0.01">
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="importFormData.ingredientId = 0">Hủy</button>
+              <button type="submit" class="btn btn-primary">Nhập hàng</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

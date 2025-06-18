@@ -1,0 +1,54 @@
+<div class="order-list-container">
+  <h2>Danh Sách Đơn Hàng</h2>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <p>Đang tải danh sách đơn hàng...</p>
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    <p>{{ error }}</p>
+    <button class="retry-button" (click)="loadOrders()">Thử lại</button>
+  </div>
+
+  <div class="order-list" *ngIf="!loading && !error">
+    <div class="order-item" *ngFor="let order of orders" (click)="viewOrderDetail(order.orderId)">
+      <div class="order-info">
+        <div class="order-header">
+          <span class="order-id">Đơn hàng #{{order.orderId}}</span>
+        </div>
+        
+        <div class="order-details">
+          <p><strong>Thời gian đặt:</strong> {{order.orderTime | date:'dd/MM/yyyy HH:mm'}}</p>
+          <p><strong>Tổng tiền:</strong> {{order.totalPrice | currency:'VND':'symbol-narrow':'1.0-0'}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-orders" *ngIf="!loading && !error && orders.length === 0">
+    <p>Không có đơn hàng nào.</p>
+  </div>
+
+  <!-- Modal hiển thị chi tiết đơn hàng -->
+  <div class="order-detail-modal" *ngIf="selectedOrder">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Chi tiết đơn hàng #{{ selectedOrder.orderId }}</h3>
+        <button class="close-button" (click)="closeOrderDetail()">×</button>
+      </div>
+      <p><strong>Thời gian đặt:</strong> {{ selectedOrder.orderTime | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p><strong>Tổng cộng:</strong> {{ selectedOrder.totalPrice | currency:'VND':'symbol-narrow':'1.0-0' }}</p>
+      <h4>Các món đã đặt:</h4>
+      <div class="order-items">
+        <div class="order-item" *ngFor="let item of selectedOrder.orderItems">
+          <img [src]="item.drink.imageUrl" alt="{{ item.drink.name }}" class="item-image" />
+          <div class="item-details">
+            <div class="item-name">{{ item.drink.name }}</div>
+            <div class="item-quantity">Số lượng: {{ item.quantity }}</div>
+            <div class="item-price">Giá: {{ item.drink.price | currency:'VND':'symbol-narrow':'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

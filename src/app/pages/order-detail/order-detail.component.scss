@@ -1,0 +1,94 @@
+/* src/app/pages/order-detail/order-detail.component.scss */
+
+.order-detail-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-family: sans-serif;
+    margin-top: 100px;
+  
+    h2, h3 {
+      text-align: center;
+      color: #333;
+    }
+  
+    p {
+      margin-bottom: 10px;
+    }
+  
+    .order-items {
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+  
+      .order-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px dotted #ddd;
+  
+        &:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+          margin-bottom: 0;
+        }
+  
+        .item-image {
+          width: 60px;
+          height: 60px;
+          object-fit: cover;
+          margin-right: 15px;
+          border-radius: 4px;
+        }
+  
+        .item-details {
+          flex-grow: 1;
+  
+          .item-name {
+            font-weight: bold;
+            color: #555;
+          }
+  
+          .item-quantity {
+            font-size: 0.9em;
+            color: #777;
+            margin-top: 4px;
+          }
+  
+          .item-subtotal {
+            font-size: 1em;
+            font-weight: bold;
+            color: #e91e63; /* Màu hồng */
+            margin-top: 4px;
+          }
+        }
+      }
+    }
+  
+    .error-message {
+      color: #f44336; /* Red */
+      text-align: center;
+      margin-top: 15px;
+    }
+  
+    .back-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 20px;
+      background-color: #007bff; /* Blue */
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+  
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }

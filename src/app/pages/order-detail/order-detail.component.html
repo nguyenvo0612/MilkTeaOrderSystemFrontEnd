@@ -1,0 +1,30 @@
+<div class="order-detail-container">
+  <h2>Chi tiết đơn hàng</h2>
+
+  <div *ngIf="loading">Đang tải chi tiết đơn hàng...</div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div *ngIf="order">
+    <p><strong>Mã đơn hàng:</strong> {{ order.orderId }}</p>
+    <p><strong>Thời gian đặt:</strong> {{ formatDateTime(order.orderTime) }}</p>
+    <p><strong>Tổng cộng:</strong> {{ formatCurrency(order.totalPrice) }}</p>
+    <!-- Thêm các thông tin khác của Order nếu có -->
+
+    <h3>Các mặt hàng đã đặt:</h3>
+    <div class="order-items">
+      <div *ngFor="let item of order.orderItems" class="order-item">
+        <img [src]="item.drink.imageUrl" alt="{{ item.drink.name }}" class="item-image">
+        <div class="item-details">
+          <div class="item-name">{{ item.drink.name }}</div>
+          <div class="item-quantity">Số lượng: {{ item.quantity }}</div>
+          <div class="item-subtotal">{{ formatCurrency(item.subtotal) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thêm nút quay lại trang chủ -->
+    <button class="back-button" (click)="goToHome()">Quay lại trang chủ</button>
+
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<div class="drink-card" [class.unavailable]="drink.available == false">
+  <div class="drink-image">
+    <img [src]="drink.imageUrl || 'assets/images/default-drink.jpg'" [alt]="drink.name">
+  </div>
+  <div class="drink-info">
+    <h3 class="drink-name">{{ drink.name }}</h3>
+    <p class="drink-price">{{ drink.price | currency:'VND':'symbol-narrow':'1.0-0' }}</p>
+    <p class="drink-description">{{ drink.description }}</p>
+    <div class="drink-status" [class.available]="drink.available == false">
+      {{ drink.available == true ? 'Có thể làm' : 'Hết nguyên liệu' }}
+    </div>
+    <button 
+      class="add-to-cart-btn" 
+      (click)="onAddToCart()"
+      >
+      <i class="fas fa-shopping-cart"></i>
+      <span>Thêm vào giỏ</span>
+    </button>
+  </div>
+</div>
